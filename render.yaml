@@ -1,12 +1,12 @@
 services:
   - type: web
-    name: aliss-labs
-    env: node
+    name: aliss-labs-site
+    runtime: node
     buildCommand: npm install -g pnpm && pnpm install && pnpm build
     startCommand: pnpm start
     envVars:
       - key: NODE_ENV
         value: production
-    customDomains:
+    domains:
       - aliss-labs.com
       - www.aliss-labs.com
