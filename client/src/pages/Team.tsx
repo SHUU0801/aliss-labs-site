@@ -32,7 +32,7 @@ export default function Team() {
                             トップへ戻る
                         </Button>
                     </Link>
-                    <div className="mx-auto text-xl font-bold text-primary">Aliss-labs.com - Team</div>
+                    <div className="mx-auto text-xl font-bold text-primary">Aliss-labs - Team</div>
                 </div>
             </nav>
 
