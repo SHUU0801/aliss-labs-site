@@ -63,7 +63,7 @@ export default function Team() {
                                 <div className="space-y-4 text-muted-foreground">
                                     <p className="font-bold text-foreground text-xl mb-2">技術を「利益」へ翻訳する、ビジネスアーキテクト</p>
                                     <p>
-                                        ビジネスデベロップメントおよびプロジェクトマネジメントの最高責任者。ハッカソン優勝実績を持つエンジニアチーム（加納・岩本）のポテンシャルを、クライアントの「事業成長」と「実利」へと直結させるプロフェッショナル。
+                                        ビジネスデベロップメントおよびプロジェクトマネジメントの最高責任者。ハッカソン優勝実績を持つエンジニアチーム（可野・岩本）のポテンシャルを、クライアントの「事業成長」と「実利」へと直結させるプロフェッショナル。
                                     </p>
                                     <p>
                                         MEO（マップ検索最適化）やSEO、SNSマーケティングの現場で数多くの集客支援実績を持ち、データと市場心理に基づいた戦略立案を得意とする。自らも生成AIを駆使したプログラミング技術を習得しており、技術的な実現可否を即座に判断しながら、エンジニアと顧客の間に立って要件を最適化する高度なディレクションを実現。
@@ -81,15 +81,15 @@ export default function Team() {
                             </div>
                         </motion.div>
 
-                        {/* CTO - 加納 海喜 */}
+                        {/* CTO - 可野 海喜 */}
                         <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-8 items-start bg-[#eff6ff]/80 p-8 rounded-3xl border border-blue-200">
                             <div className="w-24 h-24 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden border-2 border-primary/20">
-                                <img src="/kano.png" alt="加納 海喜" className="w-full h-full object-cover object-top" />
+                                <img src="/kano.png" alt="可野 海喜" className="w-full h-full object-cover object-top" />
                             </div>
                             <div className="w-full">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h2 className="text-3xl font-bold mb-2">加納 海喜</h2>
+                                        <h2 className="text-3xl font-bold mb-2">可野 海喜</h2>
                                         <p className="text-primary font-semibold mb-4 text-lg">CTO / YORUMICHI開発リード</p>
                                     </div>
                                     <a href="https://github.com/kkaiki" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition">

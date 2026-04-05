@@ -1,548 +1,682 @@
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Github, Zap, Users, Code, Award, ExternalLink, Menu, X, Youtube, Instagram, Twitter, Video } from "lucide-react";
-import { useState, useEffect } from "react";
+import {
+  ArrowRight,
+  Award,
+  Code,
+  ExternalLink,
+  Instagram,
+  Menu,
+  Video,
+  X,
+  Youtube,
+  Zap,
+} from "lucide-react";
 
-/**
- * Design Philosophy:
- * - White-based minimalism inspired by Apple product pages
- * - Premium typography: Playfair Display for headings, Sora for body
- * - Ample whitespace and subtle depth with soft shadows
- * - Framer Motion for smooth, sophisticated animations
- * - Trust-building through public achievements (Tokyo Governor's Cup Hackathon)
- * 
- * Key Facts:
- * - Team Name: Aliss-labs
- * - Main Product: YORUMICHI - Night-time safe route navigation using crime data & street lighting
- * - Achievement: Winner of Tokyo Governor's Cup Open Data Hackathon 2025 (Japan's largest hackathon)
- * - Team Member: Kaiki Kano (CTO) - GitHub: https://github.com/kkaiki
- */
+type SubmitStatus = "idle" | "success" | "error";
+
+const navItems = [
+  { href: "#trust", label: "実績" },
+  { href: "#product", label: "プロダクト" },
+  { href: "#team", label: "チーム" },
+  { href: "#service", label: "サービス" },
+  { href: "#contact", label: "お問い合わせ" },
+];
+
+const teamMembers = [
+  {
+    name: "山本 朱倫",
+    role: "代表 / ビジネスディレクター",
+    image: "/shuri.jpg",
+    description:
+      "高度な技術をクライアントの「利益」に翻訳するブリッジ役。MEOやSNSマーケティングの知見と、目標を必ず形にする圧倒的な完遂力で事業を牽引する。",
+    points: [
+      "AI・技術のビジネス実装",
+      "営業戦略立案・集客支援",
+      "プロジェクトの圧倒的完遂力",
+    ],
+  },
+  {
+    name: "可野 海喜",
+    role: "CTO / YORUMICHI開発リード",
+    image: "/kano.png",
+    description:
+      "都知事杯ハッカソン優勝メンバー。YORUMICHIの開発を主導。AIを組み込んだ高度なアーキテクチャ設計と迅速なシステム開発を実現。",
+    points: [
+      "TypeScript / Next.js",
+      "GCP / dbt / AI (Mastra)",
+      "データ分析・可視化",
+    ],
+  },
+  {
+    name: "岩本 涼平",
+    role: "Engineer / フルスタックエンジニア",
+    image: "/ryosuke.png",
+    description:
+      "都知事杯ハッカソン優勝メンバー。YORUMICHIのフロントエンド・インフラを担当。実装品質と保守性を両立。",
+    points: [
+      "フルスタック開発",
+      "テスト・CI/CD",
+      "パフォーマンス最適化",
+    ],
+  },
+];
+
+const services = [
+  {
+    title: "新規事業・MVP開発",
+    description:
+      "アイデアを素早く形にし、市場検証を加速。ハッカソン優勝実績のスピードと品質で、0→1の立ち上げを強力にサポートします。",
+    points: [
+      "要件定義・アーキテクチャ設計",
+      "プロトタイプ・MVP開発",
+      "仮説検証・改善サイクル",
+    ],
+  },
+  {
+    title: "フルスクラッチ開発",
+    description:
+      "拡張性と保守性を備えた、次世代の基幹システムを構築。複雑なビジネス要件を、シンプルで洗練されたアーキテクチャへと昇華させます。",
+    points: [
+      "ビジネス要件の深掘り・システム設計",
+      "堅牢でスケーラブルなフルスタック開発",
+      "継続的な保守・運用・拡張サポート",
+    ],
+  },
+  {
+    title: "高度なAIソリューション",
+    description:
+      "事業の付加価値を最大化するAIインテグレーション。最新のAI技術やデータ連携を駆使し、自動化やインサイト抽出など高度なシステム要件を実現します。",
+    points: [
+      "AI活用戦略の策定・PoC",
+      "LLM・生成AIのシステム組み込み",
+      "独自データとの連携・高度分析",
+    ],
+  },
+];
 
 export default function Home() {
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactName, setContactName] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
+  const [submitMessage, setSubmitMessage] = useState("");
   const [contactCompany, setContactCompany] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactMessage, setContactMessage] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showStickyCTA, setShowStickyCTA] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowStickyCTA(window.scrollY > 600);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const closeMenu = () => setMobileMenuOpen(false);
+    window.addEventListener("resize", closeMenu);
+    return () => window.removeEventListener("resize", closeMenu);
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1,
-      },
-    },
+  const scrollToId = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMobileMenuOpen(false);
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 1.2,
-        ease: [0.16, 1, 0.3, 1] as any // Apple-like smooth easing
-      },
-    },
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!contactCompany || !contactName || !contactEmail || !contactMessage) {
+      setSubmitStatus("error");
+      setSubmitMessage("会社名、ご担当者名、メールアドレス、ご相談内容は入力必須です。");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    setSubmitMessage("");
+
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/alisslabs.jp@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          companyName: contactCompany,
+          contactName,
+          email: contactEmail,
+          phone: contactPhone,
+          message: contactMessage,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "送信に失敗しました。");
+      }
+
+      setSubmitStatus("success");
+      setSubmitMessage("お問い合わせを受け付けました。追ってご連絡します。");
+      setContactCompany("");
+      setContactName("");
+      setContactEmail("");
+      setContactPhone("");
+      setContactMessage("");
+    } catch (error) {
+      setSubmitStatus("error");
+      setSubmitMessage(error instanceof Error ? error.message : "送信に失敗しました。");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-white text-foreground">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white z-50 border-b-2 border-neutral-100 shadow-sm">
-        <div className="container px-4 md:px-8 flex items-center justify-between h-20">
-          <div className="text-2xl md:text-3xl font-black text-neutral-900 tracking-tighter uppercase">Aliss-labs</div>
-          <div className="hidden md:flex items-center gap-8 font-bold text-sm">
-            <a href="#trust" className="hover:text-neutral-500 transition-colors">
-              実績
-            </a>
-            <a href="#product" className="hover:text-neutral-500 transition-colors">
-              プロダクト
-            </a>
-            <a href="#team" className="hover:text-neutral-500 transition-colors">
-              チーム
-            </a>
-            <a href="#service" className="hover:text-neutral-500 transition-colors">
-              サービス
-            </a>
-            <a href="#contact" className="hover:text-neutral-500 transition-colors">
-              お問い合わせ
-            </a>
+      <nav className="fixed top-0 z-50 w-full border-b border-border bg-white/80 backdrop-blur-md">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="text-xl font-bold text-primary md:text-2xl">Aliss-labs</div>
+
+          <div className="hidden gap-8 md:flex">
+            {navItems.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="text-sm transition hover:text-primary"
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
+
           <div className="md:hidden">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 hover:bg-neutral-100 rounded-full transition"
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="rounded-lg p-2 transition hover:bg-secondary"
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? (
-                <X className="w-8 h-8" />
-              ) : (
-                <Menu className="w-8 h-8" />
-              )}
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
-
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setMobileMenuOpen(false)}
-                className="fixed inset-0 bg-black/40 z-30 md:hidden"
-              />
-              <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "100%" }}
-                transition={{ type: "tween", duration: 0.3 }}
-                className="fixed top-0 right-0 h-screen w-[85%] max-w-sm bg-white z-40 md:hidden shadow-2xl overflow-y-auto"
-              >
-                <div className="flex flex-col h-full">
-                  <div className="flex justify-end p-6">
-                    <button
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="p-2 bg-neutral-100 hover:bg-neutral-200 rounded-full transition"
-                    >
-                      <X className="w-6 h-6" />
-                    </button>
-                  </div>
-                  <nav className="flex-1 px-8 py-4 space-y-6">
-                    <a href="#trust" onClick={() => setMobileMenuOpen(false)} className="block text-2xl font-black">実績</a>
-                    <a href="#product" onClick={() => setMobileMenuOpen(false)} className="block text-2xl font-black">プロダクト</a>
-                    <a href="#team" onClick={() => setMobileMenuOpen(false)} className="block text-2xl font-black">チーム</a>
-                    <a href="#service" onClick={() => setMobileMenuOpen(false)} className="block text-2xl font-black">サービス</a>
-                    <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block text-2xl font-black">お問い合わせ</a>
-                  </nav>
-                </div>
-              </motion.div>
-            </>
-          )}
         </div>
+
+        {mobileMenuOpen && (
+          <div className="border-t border-border bg-white md:hidden">
+            <div className="container flex flex-col gap-4 py-4">
+              {navItems.map((item) => (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() => scrollToId(item.href.slice(1))}
+                  className="text-left text-base font-medium text-foreground"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
-      {/* Hero Section - Starbucks style big split banner */}
-      <section className="pt-20 md:pt-28 pb-10 bg-white">
-        <div className="container px-4 md:px-8">
-          <div className="flex flex-col lg:flex-row rounded-lg overflow-hidden bg-neutral-900 text-white shadow-2xl">
-            <div className="lg:w-1/2 p-10 md:p-16 flex flex-col justify-center">
-              <span className="text-neutral-400 font-bold tracking-widest uppercase mb-4 text-sm">Aliss-labs</span>
-              <h1 className="text-4xl md:text-6xl font-black mb-6 leading-tight">
-                0→1を、<br />社会実装へ。
-              </h1>
-              <p className="text-lg md:text-xl text-neutral-300 mb-10 font-bold leading-relaxed max-w-md">
-                都知事杯ハッカソン優勝。最新技術をビジネス価値へ翻訳し、複雑な要件を拡張性の高いシステムへと昇華。
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Button size="lg" className="rounded-full border-2 border-white bg-transparent hover:bg-white hover:text-neutral-900 text-white font-bold px-8 py-6 text-lg transition-all" onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}>
-                  無料相談
-                </Button>
-                <Button size="lg" className="rounded-full bg-white text-neutral-900 hover:bg-neutral-200 font-bold px-8 py-6 text-lg transition-all" onClick={() => document.getElementById("trust")?.scrollIntoView({ behavior: "smooth" })}>
-                  実績を見る
-                </Button>
-              </div>
+      <section className="relative flex min-h-[85vh] items-center overflow-hidden bg-white pb-20 pt-32">
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute right-0 top-0 h-[800px] w-[800px] translate-x-1/3 -translate-y-1/4 rounded-full bg-gradient-to-bl from-neutral-200 via-neutral-100 to-transparent opacity-70 blur-[120px]" />
+          <div className="absolute bottom-0 left-0 h-[600px] w-[600px] -translate-x-1/4 translate-y-1/4 rounded-full bg-gradient-to-tr from-neutral-300 via-neutral-100 to-transparent opacity-50 blur-[100px]" />
+        </div>
+
+        <div className="container relative z-10">
+          <div className="max-w-4xl">
+            <h1 className="mb-8 text-5xl font-sans font-bold leading-[1.1] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
+              0→1を、
+              <br />
+              <span className="bg-gradient-to-r from-neutral-900 via-neutral-600 to-neutral-400 bg-clip-text text-transparent">
+                社会実装へ。
+              </span>
+            </h1>
+
+            <p className="mb-10 max-w-2xl text-lg leading-relaxed text-neutral-500 sm:text-xl">
+              都知事杯ハッカソン優勝。最新技術をビジネス価値へ翻訳し、複雑な要件をシンプルかつ拡張性の高いシステムへと昇華させる精鋭開発ギルド。
+            </p>
+
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Button
+                className="gap-2 bg-neutral-900 px-6 text-white shadow-xl transition-all duration-300 hover:bg-neutral-800 hover:shadow-2xl"
+                onClick={() => scrollToId("contact")}
+              >
+                まずは無料相談から
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="outline"
+                className="border-neutral-300 px-6 transition-colors duration-300 hover:bg-neutral-50"
+                onClick={() => scrollToId("trust")}
+              >
+                実績を見る
+              </Button>
             </div>
-            <div className="lg:w-1/2 bg-neutral-100 relative min-h-[300px] flex items-center justify-center p-8">
-              <div className="absolute inset-0 bg-gradient-to-tr from-neutral-200 to-white opacity-80" />
-              <div className="relative z-10 w-4/5 aspect-square rounded-full border-[16px] border-white shadow-xl flex items-center justify-center bg-neutral-900 border-opacity-50">
-                <span className="text-6xl font-black text-white italic">AL</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="trust" className="bg-gradient-to-b from-white to-secondary/20 py-20">
+        <div className="container">
+          <div className="mb-16 text-center">
+            <div className="mb-4 inline-block rounded-full bg-primary/10 px-4 py-2">
+              <span className="text-sm font-semibold text-primary">
+                日本最大級のハッカソン優勝
+              </span>
+            </div>
+            <h2 className="mb-4 font-sans text-4xl font-bold md:text-5xl">
+              都知事杯オープンデータ・ハッカソン 2025
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              1,327名の応募から、最優秀賞「都知事杯」を受賞。複雑なデータを直感的な価値に変える技術力が、社会課題を解決します。
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
+            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm transition hover:shadow-md md:p-8">
+              <Award className="mb-4 h-12 w-12 text-primary" />
+              <h3 className="mb-2 font-sans text-xl font-bold">都知事杯 最優秀賞</h3>
+              <p className="mb-4 text-muted-foreground">
+                東京都主催「都知事杯オープンデータ・ハッカソン 2025」で最優秀賞を受賞。1,327名の応募から、132件の提案が一次審査に進出、24件がFinal Stageへ。
+              </p>
+              <a
+                href="https://shintosei.metro.tokyo.lg.jp/post_upcp7_251028/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+              >
+                公式発表を見る
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm transition hover:shadow-md md:p-8">
+              <Code className="mb-4 h-12 w-12 text-primary" />
+              <h3 className="mb-2 font-sans text-xl font-bold">YORUMICHI</h3>
+              <p className="mb-4 text-muted-foreground">
+                夜間光データ・犯罪情報・街灯密度を統合し、安全なルートを数値化。治安・明るさ・人通りを総合評価し、安心して歩ける道を可視化。
+              </p>
+              <a
+                href="/yorumichi"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+              >
+                プロジェクトの詳細を見る
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm transition hover:shadow-md md:p-8">
+              <Zap className="mb-4 h-12 w-12 text-primary" />
+              <h3 className="mb-2 font-sans text-xl font-bold">Project in Progress</h3>
+              <p className="mb-4 text-muted-foreground">
+                現在、複数の受託開発案件を進行中。AIを組み込んだ高度なシステム開発を通じて、クライアントの複雑なビジネス課題を解決しています。
+              </p>
+              <div className="inline-flex items-center gap-2 text-sm font-semibold text-primary opacity-80">
+                Coming soon
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Split Section 1 - Trust */}
-      <section id="trust" className="py-6 bg-white">
-        <div className="container px-4 md:px-8">
-          <div className="flex flex-col md:flex-row-reverse bg-neutral-100 rounded-lg overflow-hidden">
-            <div className="md:w-1/2 p-10 md:p-16 flex flex-col justify-center">
-              <h2 className="text-3xl md:text-5xl font-black mb-6 text-neutral-900 leading-tight">
-                都知事杯オープンデータ・ハッカソン 2025
-              </h2>
-              <p className="text-lg font-bold text-neutral-600 mb-8">
-                1,327名の応募から、最優秀賞「都知事杯」を受賞。<br />
-                複雑なデータを直感的な価値に変える技術力が、社会課題を解決します。
-              </p>
-              <div>
-                <a
-                  href="https://shintosei.metro.tokyo.lg.jp/post_upcp7_251028/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block rounded-full border-2 border-neutral-900 bg-transparent text-neutral-900 hover:bg-neutral-900 hover:text-white font-bold px-6 py-3 transition-all"
-                >
-                  公式発表を見る
-                </a>
-              </div>
-            </div>
-            <div className="md:w-1/2 bg-neutral-200 min-h-[400px] flex items-center justify-center p-12">
-              <Award className="w-48 h-48 text-neutral-300" />
-            </div>
+      <section id="product" className="py-20">
+        <div className="container">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 font-sans text-4xl font-bold md:text-5xl">
+              YORUMICHIが実証した、データ駆動型の社会課題解決
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              夜間の安全という社会課題を、オープンデータ・位置情報・AI分析で解決したYORUMICHI。この技術を、貴社のビジネスニーズに応用します。
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* Split Section 2 - Product */}
-      <section id="product" className="py-6 bg-white">
-        <div className="container px-4 md:px-8">
-          <div className="flex flex-col md:flex-row bg-[#ececeb] rounded-lg overflow-hidden">
-            <div className="md:w-1/2 p-10 md:p-16 flex flex-col justify-center">
-              <h2 className="text-3xl md:text-5xl font-black mb-6 text-neutral-900 leading-tight">
-                データ駆動型の<br />社会課題解決
-              </h2>
-              <p className="text-lg font-bold text-neutral-600 mb-8">
-                夜間の安全という課題を、オープンデータ・位置情報・AI分析で解決した「YORUMICHI」。この技術を、貴社のビジネスニーズに応用します。
-              </p>
-              <div>
-                <button
-                  onClick={() => window.location.href = '/yorumichi'}
-                  className="inline-block rounded-full border-2 border-neutral-900 bg-transparent text-neutral-900 hover:bg-neutral-900 hover:text-white font-bold px-6 py-3 transition-all"
-                >
-                  詳細を見る
-                </button>
-              </div>
-            </div>
-            <div className="md:w-1/2 bg-[#dbdbdb] min-h-[400px] flex items-center justify-center p-8">
-                <div className="w-full max-w-sm aspect-[4/3] rounded-xl bg-white shadow-xl flex flex-col items-center justify-center p-8 text-center rotate-3 hover:rotate-0 transition-transform duration-500">
-                  <div className="w-20 h-20 rounded-full bg-neutral-900 flex items-center justify-center mb-6">
-                    <span className="text-3xl font-black text-white">Y</span>
-                  </div>
-                  <p className="text-neutral-900 font-bold tracking-widest text-xl">YORUMICHI</p>
-                  <p className="text-neutral-500 text-sm mt-2 font-bold">INTERFACE DEMO</p>
+          <div className="grid items-center gap-8 md:grid-cols-2 md:gap-12">
+            <div>
+              <div className="flex aspect-[4/3] w-full flex-col items-center justify-center rounded-2xl border border-neutral-200 bg-gradient-to-br from-neutral-100 to-neutral-200 p-8 text-center shadow-inner">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
+                  <span className="bg-gradient-to-br from-neutral-900 to-neutral-500 bg-clip-text text-2xl font-bold text-transparent">
+                    Y
+                  </span>
                 </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section id="team" className="py-20 bg-[#f4f4f3]">
-        <div className="container px-4 md:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-4 text-neutral-900 tracking-tight">TEAM</h2>
-            <p className="text-lg font-bold text-neutral-600">
-              都知事杯ハッカソン優勝メンバーが、貴社のプロジェクトに専任。
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* CEO */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-md flex flex-col items-center p-10 hover:-translate-y-2 transition-transform duration-300">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-neutral-100">
-                <img src="/shuri.jpg" alt="山本 朱倫" className="w-full h-full object-cover object-top" />
+                <p className="font-medium tracking-wide text-neutral-500">YORUMICHI Interface</p>
               </div>
-              <h3 className="text-2xl font-black mb-2 text-neutral-900">山本 朱倫</h3>
-              <p className="text-sm font-bold text-neutral-500 mb-6 uppercase tracking-widest">CEO / Director</p>
-              <p className="text-neutral-600 font-medium text-center">
-                高度な技術を「利益」に翻訳するブリッジ役。目標を必ず形にする圧倒的な完遂力で事業を牽引。
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                YORUMICHI - 夜間の安全なルートを数値化・可視化
               </p>
             </div>
 
-            {/* CTO */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-md flex flex-col items-center p-10 hover:-translate-y-2 transition-transform duration-300">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-neutral-100">
-                <img src="/kano.png" alt="加納 海喜" className="w-full h-full object-cover object-top" />
-              </div>
-              <h3 className="text-2xl font-black mb-2 text-neutral-900">加納 海喜</h3>
-              <p className="text-sm font-bold text-neutral-500 mb-6 uppercase tracking-widest">CTO / Lead Arch</p>
-              <p className="text-neutral-600 font-medium text-center">
-                AIを組み込んだ高度なアーキテクチャ設計と迅速なシステム開発を実現。
-              </p>
-            </div>
-
-            {/* Engineer */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-md flex flex-col items-center p-10 hover:-translate-y-2 transition-transform duration-300">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-neutral-100">
-                <img src="/ryosuke.png" alt="岩本 涼平" className="w-full h-full object-cover object-top" />
-              </div>
-              <h3 className="text-2xl font-black mb-2 text-neutral-900">岩本 涼平</h3>
-              <p className="text-sm font-bold text-neutral-500 mb-6 uppercase tracking-widest">Engineer</p>
-              <p className="text-neutral-600 font-medium text-center">
-                フロントエンド・インフラを担当。高度なUI実装品質と堅牢な保守性を両立。
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Service Menu Section */}
-      <section id="service" className="py-20 bg-white">
-        <div className="container px-4 md:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-4 text-neutral-900 tracking-tight">SERVICE</h2>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="bg-neutral-900 text-white rounded-lg p-10 md:p-14 flex flex-col justify-between shadow-xl">
+            <div className="space-y-6">
               <div>
-                <h3 className="text-3xl font-black mb-6">新規事業・MVP開発</h3>
-                <p className="text-lg font-bold text-neutral-300 leading-relaxed mb-8">
-                  アイデアを素早く形にし、市場検証を加速。<br />
-                  ハッカソン優勝実績のスピードと品質で、<br />0→1の立ち上げを強力にサポートします。
+                <h3 className="mb-2 font-sans text-xl font-bold md:text-2xl">
+                  夜間光データ × 犯罪情報
+                </h3>
+                <p className="text-muted-foreground">
+                  街灯密度、夜間の明るさ、犯罪件数など複数のデータソースを統合。「怖い」という漠然とした不安を、データで可視化。
                 </p>
               </div>
               <div>
-                <ul className="space-y-4 font-bold text-neutral-400 mb-8 list-none">
-                  <li>— 要件定義・アーキテクチャ設計</li>
-                  <li>— プロトタイプ・MVP開発</li>
-                  <li>— 仮説検証・改善サイクル</li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-8">
-              <div className="bg-neutral-100 rounded-lg p-10 flex-1 shadow-sm">
-                <h3 className="text-2xl font-black mb-4 text-neutral-900">フルスクラッチ開発</h3>
-                <p className="text-base font-bold text-neutral-600 leading-relaxed">
-                  拡張性と保守性を備えた、次世代の基幹システムを構築。複雑なビジネス要件を、シンプルで洗練されたアーキテクチャへと昇華させます。
+                <h3 className="mb-2 font-sans text-xl font-bold md:text-2xl">
+                  スマートなルート提案
+                </h3>
+                <p className="text-muted-foreground">
+                  治安・明るさ・人通りを総合計算し、安心して歩ける道を自動提案。Leaflet、Google Maps APIで直感的に可視化。
                 </p>
               </div>
-              <div className="bg-neutral-100 rounded-lg p-10 flex-1 shadow-sm border-l-8 border-neutral-900">
-                <h3 className="text-2xl font-black mb-4 text-neutral-900">高度なAIソリューション</h3>
-                <p className="text-base font-bold text-neutral-600 leading-relaxed">
-                  最新の生成AI技術を駆使し、自動化やインサイト抽出など高度なシステム要件を実現。事業の付加価値を最大化します。
+              <div>
+                <h3 className="mb-2 font-sans text-xl font-bold md:text-2xl">
+                  自治体・企業への応用
+                </h3>
+                <p className="text-muted-foreground">
+                  防災計画、エリアマーケティング、都市計画。YORUMICHIの技術を、貴社の課題に応用します。
                 </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-neutral-900 border-t-8 border-neutral-800">
-        <div className="container px-4 md:px-8 max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-black mb-4 text-white tracking-tight">CONTACT</h2>
-            <p className="text-lg font-bold text-neutral-400">
-              貴社のビジョンを、社会実装へ。
-            </p>
-          </div>
-
-          <form className="bg-white p-8 md:p-12 rounded-lg shadow-2xl space-y-8">
-            {submitStatus === 'success' && (
-              <div className="p-6 bg-green-50 border-l-8 border-green-500 rounded text-green-900 font-bold">
-                {submitMessage}
-              </div>
-            )}
-            {submitStatus === 'error' && (
-              <div className="p-6 bg-red-50 border-l-8 border-red-500 rounded text-red-900 font-bold">
-                {submitMessage}
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-black text-neutral-900 mb-2 uppercase tracking-wide">
-                会社名 / 組織名
-              </label>
-              <input
-                type="text"
-                value={contactCompany}
-                onChange={(e) => setContactCompany(e.target.value)}
-                placeholder="例: 株式会社 〇〇"
-                required
-                className="w-full px-5 py-4 bg-neutral-100 border-2 border-transparent focus:border-neutral-900 rounded font-bold text-neutral-900 transition-colors"
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <label className="block text-sm font-black text-neutral-900 mb-2 uppercase tracking-wide">
-                  ご担当者名
-                </label>
-                <input
-                  type="text"
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  placeholder="例: 山田太郎"
-                  required
-                  className="w-full px-5 py-4 bg-neutral-100 border-2 border-transparent focus:border-neutral-900 rounded font-bold text-neutral-900 transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-black text-neutral-900 mb-2 uppercase tracking-wide">
-                  電話番号（任意）
-                </label>
-                <input
-                  type="tel"
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  placeholder="例: 090-1234-5678"
-                  className="w-full px-5 py-4 bg-neutral-100 border-2 border-transparent focus:border-neutral-900 rounded font-bold text-neutral-900 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-black text-neutral-900 mb-2 uppercase tracking-wide">
-                メールアドレス
-              </label>
-              <input
-                type="email"
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-                placeholder="example@company.com"
-                required
-                className="w-full px-5 py-4 bg-neutral-100 border-2 border-transparent focus:border-neutral-900 rounded font-bold text-neutral-900 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-black text-neutral-900 mb-2 uppercase tracking-wide">
-                ご相談内容
-              </label>
-              <textarea
-                value={contactMessage}
-                onChange={(e) => setContactMessage(e.target.value)}
-                placeholder="プロジェクトの概要、課題、期待値などをお聞かせください。"
-                rows={5}
-                required
-                className="w-full px-5 py-4 bg-neutral-100 border-2 border-transparent focus:border-neutral-900 rounded font-bold text-neutral-900 transition-colors resize-none"
-              />
-            </div>
-
+          <div className="mt-12 text-center">
             <Button
-              type="submit"
-              size="lg"
-              disabled={isSubmitting}
-              className="w-full rounded-full bg-neutral-900 hover:bg-neutral-800 text-white font-black py-6 text-lg tracking-widest shadow-xl transition-all"
-              onClick={async (e) => {
-                e.preventDefault();
-                if (!contactCompany || !contactName || !contactMessage) {
-                  setSubmitStatus('error');
-                  setSubmitMessage('会社名、担当者名、ご相談内容は入力必須です。');
-                  return;
-                }
-                setIsSubmitting(true);
-                setSubmitStatus('idle');
-                try {
-                  const response = await fetch('https://formsubmit.co/ajax/alisslabs.jp@gmail.com', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                      会社名: contactCompany,
-                      担当者名: contactName,
-                      email: contactEmail,
-                      電話番号: contactPhone,
-                      message: contactMessage,
-                    }),
-                  });
-                  const data = await response.json();
-                  if (response.ok) {
-                    setSubmitStatus('success');
-                    setSubmitMessage('お問い合わせを受け付けました。');
-                    setContactCompany(''); setContactName(''); setContactEmail(''); setContactPhone(''); setContactMessage('');
-                  } else {
-                    setSubmitStatus('error'); setSubmitMessage(data.message || 'エラーが発生しました。');
-                  }
-                } catch (error) {
-                  setSubmitStatus('error'); setSubmitMessage('送信に失敗しました。しばらく後にお試しください。');
-                } finally {
-                  setIsSubmitting(false);
-                }
+              variant="outline"
+              className="gap-2 px-6"
+              onClick={() => {
+                window.location.href = "/yorumichi";
               }}
             >
-              {isSubmitting ? '送信中...' : '相談を申し込む'}
+              YORUMICHIについて詳しく見る
+              <ArrowRight className="h-4 w-4" />
             </Button>
-          </form>
+          </div>
         </div>
       </section>
 
-      {/* Sticky CTA Button */}
-      {showStickyCTA && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="fixed bottom-6 right-6 z-40 md:bottom-8 md:right-8"
-        >
-          <Button
-            size="lg"
-            className="gap-2 shadow-lg hover:shadow-xl transition-shadow rounded-full px-6"
-            onClick={() => {
-              const contactSection = document.getElementById("contact");
-              contactSection?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            <span>まずは無料相談から</span>
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Footer */}
-      <footer className="bg-foreground text-white py-12">
+      <section
+        id="team"
+        className="relative bg-gradient-to-b from-white via-neutral-50 to-white py-20"
+      >
         <div className="container">
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-8">
-            <div>
-              <h4 className="font-bold mb-4 text-xl">Aliss-labs</h4>
-              <p className="text-sm text-white/70 mb-6">
-                都知事杯ハッカソン優勝チーム。
-                0から創る、圧倒的な速さと強さ。
-              </p>
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 font-sans text-4xl font-bold md:text-5xl">チーム構成</h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              都知事杯ハッカソン優勝メンバーが、貴社のプロジェクトに専任。技術、営業、戦略を統合した、最高のチーム体制。
+            </p>
+          </div>
 
-              {/* SNS Icons */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
+            {teamMembers.map((member) => (
+              <div
+                key={member.name}
+                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-md"
+              >
+                <div className="mb-4 flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-primary/20">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="h-full w-full object-cover object-top"
+                  />
+                </div>
+                <h3 className="mb-2 font-sans text-2xl font-bold">{member.name}</h3>
+                <p className="mb-3 text-sm font-semibold text-primary">{member.role}</p>
+                <p className="mb-4 flex-grow text-muted-foreground">{member.description}</p>
+                <ul className="mb-6 space-y-2 text-sm text-muted-foreground">
+                  {member.points.map((point) => (
+                    <li key={point}>✓ {point}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Button
+              variant="outline"
+              className="gap-2 px-6"
+              onClick={() => {
+                window.location.href = "/team";
+              }}
+            >
+              チームメンバーの詳細を見る
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section id="service" className="bg-secondary/30 py-20">
+        <div className="container">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 font-sans text-4xl font-bold md:text-5xl">サービスメニュー</h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              アイデアの検証から、エンタープライズシステムまで。貴社の成長段階に応じた、最適なソリューション。
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 md:gap-8">
+            {services.map((service) => (
+              <div
+                key={service.title}
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:shadow-md md:p-8"
+              >
+                <div className="absolute right-0 top-0 -z-10 h-32 w-32 rounded-bl-full bg-gradient-to-bl from-neutral-100 to-transparent transition-transform duration-500 group-hover:scale-110" />
+                <h3 className="mb-4 font-sans text-xl font-bold md:text-2xl">{service.title}</h3>
+                <p className="mb-6 flex-grow text-muted-foreground">{service.description}</p>
+                <ul className="mb-8 space-y-3 text-sm">
+                  {service.points.map((point) => (
+                    <li key={point} className="flex gap-2">
+                      <span className="text-primary">✓</span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <Button
+              className="gap-2 rounded-full px-8 py-6 text-lg shadow-lg transition-all hover:shadow-xl"
+              onClick={() => scrollToId("contact")}
+            >
+              まずは無料相談から
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="contact"
+        className="py-20"
+        style={{
+          backgroundImage:
+            'url("https://d2xsxph8kpxj0f.cloudfront.net/310519663326135477/Eqeq6acEPPmzqFHMycahdn/contact-section-bg-aFq3K9bESdpZ3EFSrpUaqG.webp")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="container">
+          <div className="mx-auto max-w-2xl">
+            <div className="mb-12 text-center">
+              <h2 className="mb-4 font-sans text-4xl font-bold md:text-5xl">
+                最高のチームと、最高のプロダクトを。
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                貴社のビジョンを、社会実装へ。まずはお気軽にご相談ください。
+              </p>
+            </div>
+
+            <form
+              className="space-y-6 rounded-2xl bg-white p-8 shadow-lg"
+              onSubmit={handleSubmit}
+            >
+              {submitStatus === "success" && (
+                <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-900">
+                  {submitMessage}
+                </div>
+              )}
+
+              {submitStatus === "error" && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-900">
+                  {submitMessage}
+                </div>
+              )}
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold">会社名 / 組織名</label>
+                <input
+                  type="text"
+                  placeholder="例: 株式会社 〇〇"
+                  required
+                  value={contactCompany}
+                  onChange={(event) => setContactCompany(event.target.value)}
+                  className="w-full rounded-lg border border-border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold">ご担当者名</label>
+                <input
+                  type="text"
+                  placeholder="例: 山田太郎"
+                  required
+                  value={contactName}
+                  onChange={(event) => setContactName(event.target.value)}
+                  className="w-full rounded-lg border border-border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold">メールアドレス</label>
+                <input
+                  type="email"
+                  placeholder="example@company.com"
+                  required
+                  value={contactEmail}
+                  onChange={(event) => setContactEmail(event.target.value)}
+                  className="w-full rounded-lg border border-border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold">電話番号（任意）</label>
+                <input
+                  type="tel"
+                  placeholder="例: 090-1234-5678"
+                  value={contactPhone}
+                  onChange={(event) => setContactPhone(event.target.value)}
+                  className="w-full rounded-lg border border-border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold">ご相談内容</label>
+                <textarea
+                  placeholder="プロジェクトの概要、課題、期待値などをお聞かせください。"
+                  rows={5}
+                  required
+                  value={contactMessage}
+                  onChange={(event) => setContactMessage(event.target.value)}
+                  className="w-full resize-none rounded-lg border border-border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "送信中..." : "相談を申し込む"}
+              </Button>
+
+              <p className="text-center text-xs text-muted-foreground">
+                プライバシーポリシーに同意の上、送信してください。
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-foreground py-12 text-white">
+        <div className="container">
+          <div className="mb-8 grid gap-6 sm:grid-cols-2 md:grid-cols-4 md:gap-8">
+            <div>
+              <h4 className="mb-4 font-sans text-xl font-bold">Aliss-labs</h4>
+              <p className="mb-6 text-sm text-white/70">
+                都知事杯ハッカソン優勝チーム。0から創る、圧倒的な速さと強さ。
+              </p>
               <div className="flex gap-4">
-                <a href="https://youtube.com/@aliss-labs?si=ynRu90eMUv4o3JmY" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Youtube className="w-5 h-5 text-white" />
+                <a
+                  href="https://youtube.com/@aliss-labs?si=ynRu90eMUv4o3JmY"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-primary"
+                >
+                  <Youtube className="h-5 w-5 text-white" />
                   <span className="sr-only">YouTube</span>
                 </a>
-                <a href="https://www.tiktok.com/@alisslabs?_r=1&_t=ZS-950wtmJ8Fbp" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Video className="w-5 h-5 text-white" />
+                <a
+                  href="https://www.tiktok.com/@alisslabs?_r=1&_t=ZS-950wtmJ8Fbp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-primary"
+                >
+                  <Video className="h-5 w-5 text-white" />
                   <span className="sr-only">TikTok</span>
                 </a>
-                <a href="https://www.instagram.com/aliss_labs?igsh=d3hrZmFvNGxuNDBz" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Instagram className="w-5 h-5 text-white" />
+                <a
+                  href="https://www.instagram.com/aliss_labs?igsh=d3hrZmFvNGxuNDBz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-primary"
+                >
+                  <Instagram className="h-5 w-5 text-white" />
                   <span className="sr-only">Instagram</span>
                 </a>
-                <a href="https://x.com/aliss_labs" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
-                  <Twitter className="w-5 h-5 text-white" />
-                  <span className="sr-only">X (Twitter)</span>
+                <a
+                  href="https://x.com/aliss_labs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-primary"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-white"
+                  >
+                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+                  </svg>
+                  <span className="sr-only">X</span>
                 </a>
               </div>
             </div>
+
             <div>
-              <h4 className="font-bold mb-4">サービス</h4>
+              <h4 className="mb-4 font-sans font-bold">サービス</h4>
               <ul className="space-y-2 text-sm text-white/70">
                 <li>
-                  <a href="#service" className="hover:text-white transition">
+                  <a href="#service" className="transition hover:text-white">
                     MVP開発
                   </a>
                 </li>
                 <li>
-                  <a href="#service" className="hover:text-white transition">
+                  <a href="#service" className="transition hover:text-white">
                     フルスクラッチ開発
                   </a>
                 </li>
                 <li>
-                  <a href="#service" className="hover:text-white transition">
+                  <a href="#service" className="transition hover:text-white">
                     自治体・DX支援
                   </a>
                 </li>
               </ul>
             </div>
+
             <div>
-              <h4 className="font-bold mb-4">チーム</h4>
+              <h4 className="mb-4 font-sans font-bold">チーム</h4>
               <ul className="space-y-2 text-sm text-white/70">
                 <li>
-                  <a href="#team" className="hover:text-white transition">
+                  <a href="#team" className="transition hover:text-white">
                     メンバー紹介
                   </a>
                 </li>
@@ -551,18 +685,19 @@ export default function Home() {
                     href="https://github.com/kkaiki"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-white transition"
+                    className="transition hover:text-white"
                   >
                     GitHub
                   </a>
                 </li>
               </ul>
             </div>
+
             <div>
-              <h4 className="font-bold mb-4">お問い合わせ</h4>
+              <h4 className="mb-4 font-sans font-bold">お問い合わせ</h4>
               <ul className="space-y-2 text-sm text-white/70">
                 <li>
-                  <a href="#contact" className="hover:text-white transition">
+                  <a href="#contact" className="transition hover:text-white">
                     相談フォーム
                   </a>
                 </li>
@@ -571,10 +706,10 @@ export default function Home() {
           </div>
 
           <div className="border-t border-white/20 pt-8 text-center text-sm text-white/60">
-            <p>&copy; 2026 YORUMICHI. All rights reserved.</p>
+            <p>© 2026 YORUMICHI. All rights reserved.</p>
           </div>
         </div>
       </footer>
-    </div >
+    </div>
   );
 }
