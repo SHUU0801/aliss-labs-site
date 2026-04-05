@@ -1,6 +1,8 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Github, Users, Code, Zap, ArrowLeft, ExternalLink } from "lucide-react";
-import { Link } from "wouter";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function Team() {
@@ -26,12 +28,12 @@ export default function Team() {
             {/* Navigation */}
             <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-border">
                 <div className="container flex items-center h-16">
-                    <Link href="/">
-                        <Button variant="ghost" size="sm" className="gap-2">
+                    <Button asChild variant="ghost" size="sm" className="gap-2">
+                        <Link href="/">
                             <ArrowLeft className="w-4 h-4" />
                             トップへ戻る
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     <div className="mx-auto text-xl font-bold text-primary">Aliss-labs - Team</div>
                 </div>
             </nav>

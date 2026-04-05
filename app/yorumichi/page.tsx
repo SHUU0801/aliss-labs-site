@@ -1,6 +1,8 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { ArrowLeft, Shield, Map, Lightbulb, Zap, Truck, Building2, ShieldAlert, Code, ExternalLink } from "lucide-react";
-import { Link } from "wouter";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function Yorumichi() {
@@ -22,12 +24,12 @@ export default function Yorumichi() {
             {/* Navigation */}
             <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-border">
                 <div className="container flex items-center h-16">
-                    <Link href="/">
-                        <Button variant="ghost" size="sm" className="gap-2">
+                    <Button asChild variant="ghost" size="sm" className="gap-2">
+                        <Link href="/">
                             <ArrowLeft className="w-4 h-4" />
                             トップへ戻る
-                        </Button>
-                    </Link>
+                        </Link>
+                    </Button>
                     <div className="mx-auto text-xl font-bold text-primary">YORUMICHI</div>
                 </div>
             </nav>
@@ -186,9 +188,9 @@ export default function Yorumichi() {
                             <p className="text-muted-foreground mb-6">
                                 YORUMICHIで培った「複雑なデータの統合と可視化」「AI・アルゴリズムの実装力」は、あらゆるビジネス課題に応用可能です。
                             </p>
-                            <Link href="/">
-                                <Button size="lg" className="rounded-full">お問い合わせはこちら</Button>
-                            </Link>
+                            <Button asChild size="lg" className="rounded-full">
+                                <Link href="/">お問い合わせはこちら</Link>
+                            </Button>
                         </motion.div>
 
                     </motion.div>

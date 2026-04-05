@@ -7,17 +7,27 @@ RUN corepack enable
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+FROM base AS deps
 
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-COPY . .
+FROM base AS builder
 
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 RUN pnpm build
 
+FROM node:20-bookworm-slim AS runner
+
+WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8080
 
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
 EXPOSE 8080
 
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]
