@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { motion, useReducedMotion, useScroll, useTransform, type Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   Award,
-  Code,
   ExternalLink,
   Instagram,
   MapPinned,
@@ -16,7 +16,6 @@ import {
   Video,
   X,
   Youtube,
-  Zap,
 } from "lucide-react";
 
 type SubmitStatus = "idle" | "success" | "error";
@@ -143,6 +142,102 @@ const socialLinks = [
   },
 ];
 
+const sectionReveal: Variants = {
+  hidden: { opacity: 0, y: 48 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.9,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.12,
+    },
+  },
+};
+
+const itemReveal: Variants = {
+  hidden: { opacity: 0, y: 26 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+function LightTrail({
+  className,
+  delay = 0,
+  duration = 8,
+}: {
+  className: string;
+  delay?: number;
+  duration?: number;
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, scaleX: 0.3 }}
+      animate={{ opacity: [0, 1, 0.45, 0], scaleX: [0.3, 1, 1.08, 0.6] }}
+      transition={{ duration, repeat: Number.POSITIVE_INFINITY, delay, ease: "easeInOut" }}
+    />
+  );
+}
+
+function DataPulse({
+  className,
+  delay = 0,
+}: {
+  className: string;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      className={className}
+      animate={{
+        scale: [1, 1.55, 1],
+        opacity: [0.5, 1, 0.55],
+      }}
+      transition={{
+        duration: 2.4,
+        delay,
+        repeat: Number.POSITIVE_INFINITY,
+        ease: "easeInOut",
+      }}
+    />
+  );
+}
+
+function SectionHeading({
+  kicker,
+  title,
+  body,
+}: {
+  kicker: string;
+  title: React.ReactNode;
+  body: string;
+}) {
+  return (
+    <motion.div
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.25 }}
+      className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+    >
+      <motion.div variants={itemReveal}>
+        <div className="urban-kicker">{kicker}</div>
+        <h2 className="mt-4 max-w-4xl text-4xl text-white md:text-5xl">{title}</h2>
+      </motion.div>
+      <motion.p variants={itemReveal} className="max-w-xl text-slate-300">
+        {body}
+      </motion.p>
+    </motion.div>
+  );
+}
+
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,12 +248,26 @@ export default function Home() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactMessage, setContactMessage] = useState("");
+  const shouldReduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const heroY = useTransform(scrollYProgress, [0, 0.45], [0, shouldReduceMotion ? 0 : 180]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, shouldReduceMotion ? 1 : 0.5]);
+  const gridOpacity = useTransform(scrollYProgress, [0, 0.45], [0.65, 0.18]);
 
   useEffect(() => {
     const closeMenu = () => setMobileMenuOpen(false);
     window.addEventListener("resize", closeMenu);
     return () => window.removeEventListener("resize", closeMenu);
   }, []);
+
+  const signalLines = useMemo(
+    () => [
+      { delay: 0.2, className: "absolute left-[8%] top-[15%] h-px w-[36%] rotate-[18deg] bg-gradient-to-r from-transparent via-cyan-200/80 to-transparent" },
+      { delay: 1.1, className: "absolute right-[12%] top-[38%] h-px w-[30%] -rotate-[12deg] bg-gradient-to-r from-transparent via-fuchsia-300/75 to-transparent" },
+      { delay: 2.2, className: "absolute left-[16%] bottom-[25%] h-px w-[40%] rotate-[6deg] bg-gradient-to-r from-transparent via-sky-200/75 to-transparent" },
+    ],
+    [],
+  );
 
   const scrollToId = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -217,14 +326,15 @@ export default function Home() {
 
   return (
     <div className="urban-shell min-h-screen text-foreground">
-      <div className="urban-grid pointer-events-none fixed inset-0 opacity-60" />
+      <motion.div style={{ opacity: gridOpacity }} className="urban-grid pointer-events-none fixed inset-0" />
       <div className="urban-glow urban-glow-a pointer-events-none fixed left-[-10%] top-0" />
       <div className="urban-glow urban-glow-b pointer-events-none fixed right-[-15%] top-[20%]" />
       <div className="urban-glow urban-glow-c pointer-events-none fixed bottom-[-10%] left-[20%]" />
+      <div className="urban-noise pointer-events-none fixed inset-0 opacity-30" />
 
       <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-slate-950/70 backdrop-blur-xl">
         <div className="container flex h-[4.5rem] items-center justify-between py-4">
-          <div className="flex items-center gap-3">
+          <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/30 bg-cyan-400/10 text-cyan-200 shadow-[0_0_30px_rgba(34,211,238,0.18)]">
               <Sparkles className="h-4 w-4" />
             </div>
@@ -232,18 +342,21 @@ export default function Home() {
               <div className="text-xs uppercase tracking-[0.35em] text-cyan-200/60">Urban Night Lab</div>
               <div className="text-lg font-semibold text-white">Aliss-labs</div>
             </div>
-          </div>
+          </motion.div>
 
           <div className="hidden items-center gap-8 md:flex">
-            {navItems.map((item) => (
-              <button
+            {navItems.map((item, index) => (
+              <motion.button
                 key={item.href}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 * index }}
                 type="button"
                 onClick={() => scrollToId(item.href.slice(1))}
                 className="text-sm text-slate-300 transition hover:text-cyan-200"
               >
                 {item.label}
-              </button>
+              </motion.button>
             ))}
           </div>
 
@@ -258,7 +371,11 @@ export default function Home() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-white/10 bg-slate-950/90 md:hidden">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border-t border-white/10 bg-slate-950/90 md:hidden"
+          >
             <div className="container flex flex-col gap-3 py-4">
               {navItems.map((item) => (
                 <button
@@ -271,34 +388,42 @@ export default function Home() {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
       </nav>
 
       <main className="relative">
-        <section className="relative overflow-hidden pb-24 pt-36 md:pb-32 md:pt-44">
+        <motion.section style={{ y: heroY, opacity: heroOpacity }} className="relative overflow-hidden pb-24 pt-36 md:pb-32 md:pt-44">
           <div className="container relative z-10">
             <div className="grid gap-14 lg:grid-cols-[minmax(0,1.1fr)_420px] lg:items-end">
-              <div>
-                <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/8 px-4 py-2 text-xs uppercase tracking-[0.3em] text-cyan-200/80">
-                  <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,0.9)]" />
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={sectionReveal}
+              >
+                <motion.div variants={itemReveal} className="mb-6 inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/8 px-4 py-2 text-xs uppercase tracking-[0.3em] text-cyan-200/80">
+                  <motion.span
+                    animate={{ boxShadow: ["0 0 0 rgba(103,232,249,0.2)", "0 0 18px rgba(103,232,249,0.9)", "0 0 0 rgba(103,232,249,0.2)"] }}
+                    transition={{ duration: 2.4, repeat: Number.POSITIVE_INFINITY }}
+                    className="h-2 w-2 rounded-full bg-cyan-300"
+                  />
                   Light up the unknown
-                </div>
+                </motion.div>
 
-                <h1 className="max-w-5xl text-5xl font-semibold leading-[0.92] tracking-[-0.05em] text-white sm:text-6xl md:text-7xl lg:text-[7.2rem]">
+                <motion.h1 variants={itemReveal} className="max-w-5xl text-5xl font-semibold leading-[0.92] tracking-[-0.05em] text-white sm:text-6xl md:text-7xl lg:text-[7.2rem]">
                   都市の暗闇を、
                   <br />
                   <span className="urban-headline">社会実装の光</span>
                   <br />
                   に変える。
-                </h1>
+                </motion.h1>
 
-                <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
+                <motion.p variants={itemReveal} className="mt-8 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
                   Aliss-labs は、AI、都市データ、プロダクト実装を接続する少数精鋭チームです。
                   曖昧な課題を、光るインターフェースと実際に動くシステムへ変換します。
-                </p>
+                </motion.p>
 
-                <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <motion.div variants={itemReveal} className="mt-10 flex flex-col gap-4 sm:flex-row">
                   <Button
                     onClick={() => scrollToId("contact")}
                     className="urban-primary-button h-14 rounded-full px-8 text-base"
@@ -313,21 +438,36 @@ export default function Home() {
                   >
                     ケーススタディを見る
                   </Button>
-                </div>
+                </motion.div>
 
-                <div className="mt-12 grid gap-3 md:grid-cols-3">
-                  {heroSignals.map((signal) => (
-                    <div key={signal.label} className="urban-panel rounded-3xl p-5">
+                <motion.div variants={itemReveal} className="mt-12 grid gap-3 md:grid-cols-3">
+                  {heroSignals.map((signal, index) => (
+                    <motion.div
+                      key={signal.label}
+                      whileHover={{ y: -6, scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 220, damping: 18 }}
+                      className="urban-panel rounded-3xl p-5"
+                    >
                       <div className="text-[11px] uppercase tracking-[0.28em] text-cyan-200/50">
                         {signal.label}
                       </div>
                       <div className="mt-3 text-sm font-medium text-slate-100">{signal.value}</div>
-                    </div>
+                      <motion.div
+                        className="mt-5 h-px bg-gradient-to-r from-cyan-300/50 via-white/70 to-transparent"
+                        animate={{ opacity: [0.4, 1, 0.4], scaleX: [0.8, 1, 0.8] }}
+                        transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, delay: index * 0.35 }}
+                      />
+                    </motion.div>
                   ))}
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
-              <div className="urban-panel relative overflow-hidden rounded-[2rem] p-6">
+              <motion.div
+                initial={{ opacity: 0, x: 40, rotateX: -8 }}
+                animate={{ opacity: 1, x: 0, rotateX: 0 }}
+                transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.16 }}
+                className="urban-panel relative overflow-hidden rounded-[2rem] p-6"
+              >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_48%)]" />
                 <div className="relative">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -339,24 +479,48 @@ export default function Home() {
                         Urban Risk, Light, Flow
                       </div>
                     </div>
-                    <div className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100">
+                    <motion.div
+                      animate={{ boxShadow: ["0 0 0 rgba(110,231,183,0.0)", "0 0 22px rgba(110,231,183,0.35)", "0 0 0 rgba(110,231,183,0.0)"] }}
+                      transition={{ duration: 2.8, repeat: Number.POSITIVE_INFINITY }}
+                      className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-100"
+                    >
                       Live concept
-                    </div>
+                    </motion.div>
                   </div>
 
                   <div className="relative mt-6 aspect-[4/5] overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/80">
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,182,212,0.12),transparent_45%,rgba(217,70,239,0.12))]" />
-                    <div className="absolute inset-x-0 top-8 h-px bg-gradient-to-r from-transparent via-cyan-200/70 to-transparent shadow-[0_0_20px_rgba(103,232,249,0.75)]" />
-                    <div className="absolute left-[20%] top-[18%] h-32 w-px bg-gradient-to-b from-transparent via-cyan-200/60 to-transparent" />
-                    <div className="absolute right-[23%] top-[26%] h-24 w-px bg-gradient-to-b from-transparent via-fuchsia-300/50 to-transparent" />
-                    <div className="absolute left-[12%] top-[58%] h-px w-56 bg-gradient-to-r from-transparent via-cyan-200/65 to-transparent" />
-                    <div className="absolute right-[10%] top-[48%] h-px w-48 bg-gradient-to-r from-transparent via-violet-300/60 to-transparent" />
-                    <div className="absolute left-[18%] top-[18%] h-3 w-3 rounded-full bg-cyan-300 shadow-[0_0_26px_rgba(103,232,249,0.95)]" />
-                    <div className="absolute right-[23%] top-[26%] h-3 w-3 rounded-full bg-fuchsia-300 shadow-[0_0_26px_rgba(232,121,249,0.95)]" />
-                    <div className="absolute left-[28%] top-[58%] h-3 w-3 rounded-full bg-sky-300 shadow-[0_0_22px_rgba(125,211,252,0.95)]" />
-                    <div className="absolute right-[18%] top-[48%] h-3 w-3 rounded-full bg-amber-200 shadow-[0_0_22px_rgba(253,230,138,0.95)]" />
+                    <motion.div
+                      animate={{ y: ["-100%", "220%"] }}
+                      transition={{ duration: 5.5, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                      className="absolute left-0 right-0 top-0 h-24 bg-gradient-to-b from-cyan-200/0 via-cyan-200/8 to-cyan-200/0"
+                    />
 
-                    <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-slate-950/75 p-4 backdrop-blur-sm">
+                    {signalLines.map((line) => (
+                      <LightTrail key={line.className} className={line.className} delay={line.delay} />
+                    ))}
+
+                    <DataPulse className="absolute left-[18%] top-[18%] h-3 w-3 rounded-full bg-cyan-300 shadow-[0_0_26px_rgba(103,232,249,0.95)]" />
+                    <DataPulse className="absolute right-[23%] top-[26%] h-3 w-3 rounded-full bg-fuchsia-300 shadow-[0_0_26px_rgba(232,121,249,0.95)]" delay={0.8} />
+                    <DataPulse className="absolute left-[28%] top-[58%] h-3 w-3 rounded-full bg-sky-300 shadow-[0_0_22px_rgba(125,211,252,0.95)]" delay={1.6} />
+                    <DataPulse className="absolute right-[18%] top-[48%] h-3 w-3 rounded-full bg-amber-200 shadow-[0_0_22px_rgba(253,230,138,0.95)]" delay={2.2} />
+
+                    <motion.div
+                      animate={{ rotate: [0, 8, 0, -8, 0] }}
+                      transition={{ duration: 18, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                      className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300/10"
+                    />
+                    <motion.div
+                      animate={{ rotate: [360, 0] }}
+                      transition={{ duration: 22, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                      className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5"
+                    />
+
+                    <motion.div
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 3.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-slate-950/75 p-4 backdrop-blur-sm"
+                    >
                       <div className="grid grid-cols-3 gap-3">
                         {cityStats.map((stat) => (
                           <div key={stat.label}>
@@ -365,37 +529,48 @@ export default function Home() {
                           </div>
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         <section id="trust" className="relative py-24">
           <div className="container">
-            <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <div className="urban-kicker">Trust Signal</div>
-                <h2 className="mt-4 max-w-3xl text-4xl text-white md:text-5xl">
+            <SectionHeading
+              kicker="Trust Signal"
+              title={
+                <>
                   実績は、都市の中で
                   <span className="text-cyan-200"> ちゃんと光る。</span>
-                </h2>
-              </div>
-              <p className="max-w-xl text-slate-300">
-                賞歴、プロダクト、進行中案件を単なる実績一覧ではなく、Aliss-labs の現在位置を示すシグナルとして見せます。
-              </p>
-            </div>
+                </>
+              }
+              body="賞歴、プロダクト、進行中案件を単なる実績一覧ではなく、Aliss-labs の現在位置を示すシグナルとして見せます。"
+            />
 
-            <div className="grid gap-6 lg:grid-cols-3">
+            <motion.div
+              variants={sectionReveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              className="grid gap-6 lg:grid-cols-3"
+            >
               {trustCards.map((card) => {
                 const Icon = card.icon;
 
                 return (
-                  <div key={card.title} className="urban-card group relative overflow-hidden rounded-[2rem] p-7">
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-br ${card.accent} opacity-20 transition-opacity duration-500 group-hover:opacity-30`}
+                  <motion.div
+                    key={card.title}
+                    variants={itemReveal}
+                    whileHover={{ y: -10 }}
+                    className="urban-card group relative overflow-hidden rounded-[2rem] p-7"
+                  >
+                    <motion.div
+                      className={`absolute inset-0 bg-gradient-to-br ${card.accent} opacity-20`}
+                      animate={{ opacity: [0.16, 0.28, 0.18] }}
+                      transition={{ duration: 4.5, repeat: Number.POSITIVE_INFINITY }}
                     />
                     <div className="relative">
                       <div className="flex items-center justify-between">
@@ -437,17 +612,23 @@ export default function Home() {
                         </button>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         </section>
 
         <section id="product" className="relative py-24">
           <div className="container">
-            <div className="urban-case-frame grid gap-10 overflow-hidden rounded-[2rem] p-7 lg:grid-cols-[1.15fr_0.85fr] lg:p-10">
-              <div className="relative">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={sectionReveal}
+              className="urban-case-frame grid gap-10 overflow-hidden rounded-[2rem] p-7 lg:grid-cols-[1.15fr_0.85fr] lg:p-10"
+            >
+              <motion.div variants={itemReveal} className="relative">
                 <div className="urban-kicker">Case Study</div>
                 <h2 className="mt-4 max-w-2xl text-4xl text-white md:text-5xl">
                   YORUMICHI は、都市の不安を
@@ -459,24 +640,22 @@ export default function Home() {
                 </p>
 
                 <div className="mt-10 grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <div className="text-xs uppercase tracking-[0.24em] text-cyan-200/50">Input</div>
-                    <div className="mt-3 text-sm leading-6 text-slate-200">
-                      夜間光、犯罪情報、街灯、人流
-                    </div>
-                  </div>
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <div className="text-xs uppercase tracking-[0.24em] text-cyan-200/50">Engine</div>
-                    <div className="mt-3 text-sm leading-6 text-slate-200">
-                      統合スコアリング、GIS、最適ルーティング
-                    </div>
-                  </div>
-                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                    <div className="text-xs uppercase tracking-[0.24em] text-cyan-200/50">Outcome</div>
-                    <div className="mt-3 text-sm leading-6 text-slate-200">
-                      不安の可視化、行動変容、社会的価値
-                    </div>
-                  </div>
+                  {[
+                    "夜間光、犯罪情報、街灯、人流",
+                    "統合スコアリング、GIS、最適ルーティング",
+                    "不安の可視化、行動変容、社会的価値",
+                  ].map((text, index) => (
+                    <motion.div
+                      key={text}
+                      variants={itemReveal}
+                      className="rounded-3xl border border-white/10 bg-white/5 p-5"
+                    >
+                      <div className="text-xs uppercase tracking-[0.24em] text-cyan-200/50">
+                        {index === 0 ? "Input" : index === 1 ? "Engine" : "Outcome"}
+                      </div>
+                      <div className="mt-3 text-sm leading-6 text-slate-200">{text}</div>
+                    </motion.div>
+                  ))}
                 </div>
 
                 <div className="mt-10 flex flex-col gap-4 sm:flex-row">
@@ -494,11 +673,15 @@ export default function Home() {
                     この技術を応用する
                   </Button>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-slate-950/80 p-5">
+              <motion.div variants={itemReveal} className="relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-slate-950/80 p-5">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.18),transparent_35%),radial-gradient(circle_at_80%_70%,rgba(232,121,249,0.16),transparent_35%)]" />
-                <div className="relative h-full min-h-[420px] rounded-[1.4rem] border border-white/10 bg-[linear-gradient(135deg,rgba(8,47,73,0.6),rgba(15,23,42,0.85))] p-6">
+                <motion.div
+                  animate={{ rotate: [0, 1.6, -1.2, 0] }}
+                  transition={{ duration: 9, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                  className="relative h-full min-h-[420px] rounded-[1.4rem] border border-white/10 bg-[linear-gradient(135deg,rgba(8,47,73,0.6),rgba(15,23,42,0.85))] p-6"
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-xs uppercase tracking-[0.24em] text-cyan-200/50">
@@ -512,69 +695,85 @@ export default function Home() {
                   </div>
 
                   <div className="relative mt-8 h-[250px] overflow-hidden rounded-[1.4rem] border border-white/10 bg-slate-900/80">
-                    <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(15,23,42,0.05)_0%,rgba(15,23,42,0.0)_50%,rgba(15,23,42,0.05)_100%)]" />
+                    <motion.div
+                      animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
+                      transition={{ duration: 11, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse", ease: "linear" }}
+                      className="absolute inset-0 bg-[linear-gradient(120deg,rgba(15,23,42,0.1),rgba(56,189,248,0.05),rgba(15,23,42,0.1))] bg-[length:200%_200%]"
+                    />
                     <div className="absolute left-[12%] top-[12%] h-3 w-3 rounded-full bg-cyan-300 shadow-[0_0_20px_rgba(103,232,249,0.95)]" />
                     <div className="absolute left-[42%] top-[34%] h-3 w-3 rounded-full bg-fuchsia-300 shadow-[0_0_20px_rgba(232,121,249,0.95)]" />
                     <div className="absolute right-[18%] top-[24%] h-3 w-3 rounded-full bg-emerald-300 shadow-[0_0_20px_rgba(110,231,183,0.95)]" />
-                    <div className="absolute left-[14%] top-[13%] h-[2px] w-[34%] rotate-[18deg] bg-gradient-to-r from-cyan-300 via-sky-200 to-fuchsia-300 shadow-[0_0_16px_rgba(125,211,252,0.6)]" />
-                    <div className="absolute left-[44%] top-[34%] h-[2px] w-[28%] -rotate-[12deg] bg-gradient-to-r from-fuchsia-300 via-violet-200 to-emerald-300 shadow-[0_0_16px_rgba(196,181,253,0.6)]" />
-                    <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+                    <LightTrail className="absolute left-[14%] top-[13%] h-[2px] w-[34%] rotate-[18deg] bg-gradient-to-r from-cyan-300 via-sky-200 to-fuchsia-300 shadow-[0_0_16px_rgba(125,211,252,0.6)]" duration={6} />
+                    <LightTrail className="absolute left-[44%] top-[34%] h-[2px] w-[28%] -rotate-[12deg] bg-gradient-to-r from-fuchsia-300 via-violet-200 to-emerald-300 shadow-[0_0_16px_rgba(196,181,253,0.6)]" delay={1.8} duration={6.5} />
+                    <motion.div
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 3.4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+                      className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-slate-950/70 p-4"
+                    >
                       <div className="flex items-center justify-between text-sm text-slate-300">
                         <span>Safety score</span>
                         <span className="text-lg font-semibold text-white">87 / 100</span>
                       </div>
                       <div className="mt-3 h-2 rounded-full bg-white/10">
-                        <div className="h-2 w-[87%] rounded-full bg-gradient-to-r from-cyan-300 via-sky-200 to-emerald-300" />
+                        <motion.div
+                          initial={{ width: "0%" }}
+                          whileInView={{ width: "87%" }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+                          className="h-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-200 to-emerald-300"
+                        />
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
-
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Signals</div>
-                      <div className="mt-2 text-sm text-slate-200">crime / light / station / crowd</div>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Runtime</div>
-                      <div className="mt-2 text-sm text-slate-200">fast scoring / visual route / map UX</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
         <section id="team" className="relative py-24">
           <div className="container">
-            <div className="mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div>
-                <div className="urban-kicker">Team Node</div>
-                <h2 className="mt-4 text-4xl text-white md:text-5xl">
+            <SectionHeading
+              kicker="Team Node"
+              title={
+                <>
                   技術、事業、実装が
                   <span className="text-cyan-200"> 同じ画面で会話する。</span>
-                </h2>
-              </div>
-              <p className="max-w-xl text-slate-300">
-                Aliss-labs は、単に作るだけのチームではなく、構想を現場で回るプロダクトへ変換するユニットです。
-              </p>
-            </div>
+                </>
+              }
+              body="Aliss-labs は、単に作るだけのチームではなく、構想を現場で回るプロダクトへ変換するユニットです。"
+            />
 
-            <div className="grid gap-6 lg:grid-cols-3">
+            <motion.div
+              variants={sectionReveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              className="grid gap-6 lg:grid-cols-3"
+            >
               {teamMembers.map((member, index) => (
-                <div key={member.name} className="urban-card relative overflow-hidden rounded-[2rem] p-7">
+                <motion.div
+                  key={member.name}
+                  variants={itemReveal}
+                  whileHover={{ y: -8, rotateX: 2 }}
+                  className="urban-card relative overflow-hidden rounded-[2rem] p-7"
+                >
                   <div className="absolute right-6 top-6 text-[11px] uppercase tracking-[0.28em] text-slate-500">
                     Node {String(index + 1).padStart(2, "0")}
                   </div>
                   <div className="relative">
                     <div className="flex items-center gap-5">
-                      <div className="h-24 w-24 overflow-hidden rounded-full border border-cyan-300/25 bg-white/5 p-1">
+                      <motion.div
+                        animate={{ boxShadow: ["0 0 0 rgba(34,211,238,0.0)", "0 0 26px rgba(34,211,238,0.18)", "0 0 0 rgba(34,211,238,0.0)"] }}
+                        transition={{ duration: 4.2, repeat: Number.POSITIVE_INFINITY, delay: index * 0.5 }}
+                        className="h-24 w-24 overflow-hidden rounded-full border border-cyan-300/25 bg-white/5 p-1"
+                      >
                         <img
                           src={member.image}
                           alt={member.name}
                           className="h-full w-full rounded-full object-cover object-top"
                         />
-                      </div>
+                      </motion.div>
                       <div>
                         <h3 className="text-2xl text-white">{member.name}</h3>
                         <p className="mt-2 text-sm font-medium text-cyan-200">{member.role}</p>
@@ -584,44 +783,72 @@ export default function Home() {
                     <p className="mt-6 leading-7 text-slate-300">{member.description}</p>
 
                     <ul className="mt-6 space-y-3">
-                      {member.points.map((point) => (
-                        <li key={point} className="flex items-center gap-3 text-sm text-slate-200">
-                          <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.85)]" />
+                      {member.points.map((point, pointIndex) => (
+                        <motion.li
+                          key={point}
+                          initial={{ opacity: 0.4, x: 0 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: pointIndex * 0.08 }}
+                          className="flex items-center gap-3 text-sm text-slate-200"
+                        >
+                          <motion.span
+                            animate={{ opacity: [0.35, 1, 0.35] }}
+                            transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, delay: pointIndex * 0.3 }}
+                            className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.85)]"
+                          />
                           {point}
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
-            <div className="mt-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="mt-10"
+            >
               <Button asChild variant="outline" className="rounded-full border-white/15 bg-white/5 px-7 text-slate-100 hover:bg-white/10">
                 <Link href="/team">
                   メンバーの詳細を見る
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         <section id="service" className="relative py-24">
           <div className="container">
-            <div className="mb-14">
-              <div className="urban-kicker">Service Flow</div>
-              <h2 className="mt-4 max-w-4xl text-4xl text-white md:text-5xl">
-                暗闇を読み解き、
-                <span className="text-fuchsia-200"> 意味ある体験へ変換する</span>
-                までを引き受ける。
-              </h2>
-            </div>
+            <SectionHeading
+              kicker="Service Flow"
+              title={
+                <>
+                  暗闇を読み解き、
+                  <span className="text-fuchsia-200"> 意味ある体験へ変換する</span>
+                  までを引き受ける。
+                </>
+              }
+              body="要件整理だけでも、MVP でも、本番運用でもよいです。どの段階でも、技術をちゃんと使える形へ持っていきます。"
+            />
 
-            <div className="space-y-5">
+            <motion.div
+              variants={sectionReveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              className="space-y-5"
+            >
               {services.map((service) => (
-                <div
+                <motion.div
                   key={service.id}
+                  variants={itemReveal}
+                  whileHover={{ x: 6 }}
                   className="urban-service-line grid gap-8 rounded-[2rem] border border-white/10 bg-slate-950/55 p-7 backdrop-blur-sm lg:grid-cols-[120px_minmax(0,1fr)_360px]"
                 >
                   <div className="text-4xl font-semibold tracking-[-0.04em] text-cyan-200/80">
@@ -638,16 +865,22 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
         <section id="contact" className="relative overflow-hidden py-24">
           <div className="container">
-            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="urban-panel rounded-[2rem] p-8">
+            <motion.div
+              variants={sectionReveal}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]"
+            >
+              <motion.div variants={itemReveal} className="urban-panel rounded-[2rem] p-8">
                 <div className="urban-kicker">Contact Node</div>
                 <h2 className="mt-4 text-4xl text-white md:text-5xl">
                   最高のチームと、
@@ -659,22 +892,28 @@ export default function Home() {
                 </p>
 
                 <div className="mt-8 space-y-4">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <motion.div
+                    whileHover={{ x: 4 }}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                  >
                     <div className="text-xs uppercase tracking-[0.24em] text-cyan-200/50">Best for</div>
                     <div className="mt-2 text-sm leading-6 text-slate-200">
                       新規事業立ち上げ / AI 活用相談 / データプロダクト / 都市・公共領域
                     </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ x: 4 }}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                  >
                     <div className="text-xs uppercase tracking-[0.24em] text-cyan-200/50">Response</div>
                     <div className="mt-2 text-sm leading-6 text-slate-200">
                       初回の整理は無料。要件が曖昧な状態でも、前提整理から入れます。
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
 
-              <form className="urban-contact-form space-y-6 rounded-[2rem] p-8 md:p-10" onSubmit={handleSubmit}>
+              <motion.form variants={itemReveal} className="urban-contact-form space-y-6 rounded-[2rem] p-8 md:p-10" onSubmit={handleSubmit}>
                 {submitStatus === "success" && (
                   <div className="rounded-2xl border border-emerald-300/30 bg-emerald-300/10 px-4 py-3 text-sm font-medium text-emerald-50">
                     {submitMessage}
@@ -755,15 +994,21 @@ export default function Home() {
                 <p className="text-center text-xs text-slate-500">
                   プライバシーポリシーに同意の上、送信してください。
                 </p>
-              </form>
-            </div>
+              </motion.form>
+            </motion.div>
           </div>
         </section>
       </main>
 
       <footer className="border-t border-white/10 bg-slate-950/95 py-12">
         <div className="container">
-          <div className="mb-10 grid gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="mb-10 grid gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]"
+          >
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-cyan-200/50">Aliss-labs</div>
               <p className="mt-4 max-w-sm text-sm leading-7 text-slate-400">
@@ -774,7 +1019,9 @@ export default function Home() {
                   const Icon = social.icon;
 
                   return (
-                    <a
+                    <motion.a
+                      whileHover={{ y: -3, scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
                       key={social.label}
                       href={social.href}
                       target="_blank"
@@ -783,10 +1030,12 @@ export default function Home() {
                     >
                       <Icon className="h-5 w-5" />
                       <span className="sr-only">{social.label}</span>
-                    </a>
+                    </motion.a>
                   );
                 })}
-                <a
+                <motion.a
+                  whileHover={{ y: -3, scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
                   href="https://x.com/aliss_labs"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -807,7 +1056,7 @@ export default function Home() {
                     <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
                   </svg>
                   <span className="sr-only">X</span>
-                </a>
+                </motion.a>
               </div>
             </div>
 
@@ -846,7 +1095,7 @@ export default function Home() {
                 From dark data to visible value. We build things people can actually use.
               </p>
             </div>
-          </div>
+          </motion.div>
 
           <div className="border-t border-white/10 pt-6 text-sm text-slate-500">
             © 2026 Aliss-labs. Urban Night Lab direction prototype.
