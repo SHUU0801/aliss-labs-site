@@ -20,9 +20,9 @@ export default function Yorumichi() {
     };
 
     return (
-        <div className="min-h-screen bg-white text-foreground">
+        <div className="urban-shell min-h-screen text-foreground">
             {/* Navigation */}
-            <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-border">
+            <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-slate-950/70 backdrop-blur-xl">
                 <div className="container flex items-center h-16">
                     <Button asChild variant="ghost" size="sm" className="gap-2">
                         <Link href="/">
@@ -30,7 +30,7 @@ export default function Yorumichi() {
                             トップへ戻る
                         </Link>
                     </Button>
-                    <div className="mx-auto text-xl font-bold text-primary">YORUMICHI</div>
+                    <div className="mx-auto text-xl font-bold text-cyan-100">YORUMICHI</div>
                 </div>
             </nav>
 
@@ -43,7 +43,7 @@ export default function Yorumichi() {
                         animate="visible"
                     >
                         <motion.div variants={itemVariants} className="text-center mb-16">
-                            <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-4">
+                            <div className="inline-block px-4 py-2 bg-cyan-300/10 rounded-full mb-4 border border-cyan-300/20">
                                 <span className="text-sm font-semibold text-primary">都知事杯オープンデータ・ハッカソン 2025 最優秀賞</span>
                             </div>
                             <h1 className="text-4xl md:text-6xl font-bold mb-6">YORUMICHI</h1>
@@ -53,7 +53,7 @@ export default function Yorumichi() {
                             </p>
                             <div className="mb-12">
                                 <a href="https://yorumichi.com" target="_blank" rel="noopener noreferrer">
-                                    <Button size="lg" className="rounded-full shadow-lg gap-2 text-lg px-8 py-6">
+                                    <Button size="lg" className="urban-primary-button rounded-full shadow-lg gap-2 text-lg px-8 py-6">
                                         <ExternalLink className="w-5 h-5" />
                                         製品デモ版を見る (yorumichi.com)
                                     </Button>
@@ -103,7 +103,7 @@ export default function Yorumichi() {
                         </div>
 
                         {/* システムの特徴 */}
-                        <motion.div variants={itemVariants} className="bg-zinc-50 p-8 md:p-12 rounded-3xl mb-16 border border-border">
+                        <motion.div variants={itemVariants} className="urban-card p-8 md:p-12 rounded-3xl mb-16 border border-white/10">
                             <h2 className="text-3xl font-bold mb-8 text-center">コアとなるAI・データ技術</h2>
                             <div className="grid md:grid-cols-3 gap-8">
                                 <div>
@@ -138,7 +138,7 @@ export default function Yorumichi() {
 
                             <div className="grid md:grid-cols-2 gap-6">
                                 {/* 物流の効率化 */}
-                                <div className="bg-white border text-left border-border p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+                                <div className="urban-card border text-left border-white/10 p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
                                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6">
                                         <Truck className="w-6 h-6 text-primary" />
                                     </div>
@@ -149,7 +149,7 @@ export default function Yorumichi() {
                                 </div>
 
                                 {/* 不動産・インフラ */}
-                                <div className="bg-white border text-left border-border p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+                                <div className="urban-card border text-left border-white/10 p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
                                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6">
                                         <Building2 className="w-6 h-6 text-primary" />
                                     </div>
@@ -160,7 +160,7 @@ export default function Yorumichi() {
                                 </div>
 
                                 {/* 防災マップ */}
-                                <div className="bg-white border text-left border-border p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+                                <div className="urban-card border text-left border-white/10 p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
                                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-6">
                                         <ShieldAlert className="w-6 h-6 text-primary" />
                                     </div>
@@ -171,7 +171,7 @@ export default function Yorumichi() {
                                 </div>
 
                                 {/* 受託開発ソリューション */}
-                                <div className="bg-zinc-50 border text-left border-border p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+                                <div className="urban-card border text-left border-white/10 p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
                                     <div className="w-12 h-12 bg-zinc-200 rounded-full flex items-center justify-center mb-6">
                                         <Code className="w-6 h-6 text-zinc-700" />
                                     </div>
@@ -183,7 +183,7 @@ export default function Yorumichi() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={itemVariants} className="text-center mt-12 bg-primary/5 border border-primary/20 p-8 rounded-2xl">
+                        <motion.div variants={itemVariants} className="text-center mt-12 bg-cyan-300/8 border border-cyan-300/20 p-8 rounded-2xl">
                             <h3 className="text-2xl font-bold mb-4">この技術を、貴社のビジネスへ。</h3>
                             <p className="text-muted-foreground mb-6">
                                 YORUMICHIで培った「複雑なデータの統合と可視化」「AI・アルゴリズムの実装力」は、あらゆるビジネス課題に応用可能です。
