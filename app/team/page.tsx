@@ -24,9 +24,9 @@ export default function Team() {
     };
 
     return (
-        <div className="min-h-screen bg-white text-foreground">
+        <div className="urban-shell min-h-screen text-foreground">
             {/* Navigation */}
-            <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-border">
+            <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-slate-950/70 backdrop-blur-xl">
                 <div className="container flex items-center h-16">
                     <Button asChild variant="ghost" size="sm" className="gap-2">
                         <Link href="/">
@@ -34,7 +34,7 @@ export default function Team() {
                             トップへ戻る
                         </Link>
                     </Button>
-                    <div className="mx-auto text-xl font-bold text-primary">Aliss-labs - Team</div>
+                    <div className="mx-auto text-xl font-bold text-cyan-100">Aliss-labs - Team</div>
                 </div>
             </nav>
 
@@ -45,17 +45,17 @@ export default function Team() {
                     initial="hidden"
                     animate="visible"
                 >
-                    <motion.div variants={itemVariants} className="text-center mb-16">
-                        <h1 className="text-4xl md:text-5xl font-bold mb-6">経営・開発チーム</h1>
-                        <p className="text-lg text-muted-foreground">
-                            都知事杯オープンデータ・ハッカソン2025優勝。
-                            それぞれの専門分野を持つスペシャリスト達が、ビジネスの構想から社会実装までを牽引します。
-                        </p>
-                    </motion.div>
+                        <motion.div variants={itemVariants} className="text-center mb-16">
+                            <h1 className="text-4xl md:text-5xl font-bold mb-6">経営・開発チーム</h1>
+                            <p className="text-lg text-slate-300">
+                                都知事杯オープンデータ・ハッカソン2025優勝。
+                                それぞれの専門分野を持つスペシャリスト達が、ビジネスの構想から社会実装までを牽引します。
+                            </p>
+                        </motion.div>
 
                     <div className="space-y-16">
                         {/* CEO - 山本 朱倫 */}
-                        <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-8 items-start bg-[#f0f9ff]/80 p-8 rounded-3xl border border-blue-100">
+                        <motion.div variants={itemVariants} className="urban-card flex flex-col md:flex-row gap-8 items-start p-8 rounded-3xl border border-cyan-300/15">
                             <div className="w-24 h-24 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden border-2 border-primary/20">
                                 <img src="/shuri.jpg" alt="山本 朱倫" className="w-full h-full object-cover object-top" />
                             </div>
@@ -84,7 +84,7 @@ export default function Team() {
                         </motion.div>
 
                         {/* CTO - 可野 海喜 */}
-                        <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-8 items-start bg-[#eff6ff]/80 p-8 rounded-3xl border border-blue-200">
+                        <motion.div variants={itemVariants} className="urban-card flex flex-col md:flex-row gap-8 items-start p-8 rounded-3xl border border-fuchsia-300/15">
                             <div className="w-24 h-24 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden border-2 border-primary/20">
                                 <img src="/kano.png" alt="可野 海喜" className="w-full h-full object-cover object-top" />
                             </div>
@@ -116,7 +116,7 @@ export default function Team() {
                         </motion.div>
 
                         {/* Engineer - 岩本 涼平 */}
-                        <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-8 items-start bg-[#f8fafc]/80 p-8 rounded-3xl border border-slate-200">
+                        <motion.div variants={itemVariants} className="urban-card flex flex-col md:flex-row gap-8 items-start p-8 rounded-3xl border border-white/10">
                             <div className="w-24 h-24 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden border-2 border-primary/20">
                                 <img src="/ryosuke.png" alt="岩本 涼平" className="w-full h-full object-cover object-top" />
                             </div>
